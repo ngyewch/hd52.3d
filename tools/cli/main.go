@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 	"runtime/debug"
+
+	"github.com/urfave/cli/v3"
 )
 
 var (
@@ -13,14 +15,14 @@ var (
 		Name:     "serial-port",
 		Usage:    "serial port",
 		Required: true,
-		EnvVars:  []string{"SERIAL_PORT"},
+		Sources:  cli.EnvVars("SERIAL_PORT"),
 	}
 	modbusUnitIdFlag = &cli.UintFlag{
 		Name:    "modbus-unit-id",
 		Usage:   "ModBus unit ID",
 		Value:   1,
-		EnvVars: []string{"MODBUS_UNIT_ID"},
-		Action: func(cCtx *cli.Context, v uint) error {
+		Sources: cli.EnvVars("MODBUS_UNIT_ID"),
+		Action: func(ctx context.Context, cmd *cli.Command, v uint) error {
 			if (v < 1) || (v > 247) {
 				return fmt.Errorf("invalid modbus-unit-id: %d", v)
 			}
@@ -28,7 +30,7 @@ var (
 		},
 	}
 
-	app = &cli.App{
+	app = &cli.Command{
 		Name:  "hd52.3d",
 		Usage: "DeltaOHM 52.3d CLI",
 		Flags: []cli.Flag{
@@ -51,7 +53,7 @@ func main() {
 		app.Version = buildInfo.Main.Version
 	}
 
-	err := app.Run(os.Args)
+	err := app.Run(context.Background(), os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}

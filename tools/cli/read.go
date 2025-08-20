@@ -1,12 +1,14 @@
 package main
 
 import (
-	hd52_3d "github.com/ngyewch/hd52.3d"
-	"github.com/simonvetter/modbus"
-	"github.com/urfave/cli/v2"
-	"github.com/yassinebenaid/godump"
+	"context"
 	"sync"
 	"time"
+
+	hd52_3d "github.com/ngyewch/hd52.3d"
+	"github.com/simonvetter/modbus"
+	"github.com/urfave/cli/v3"
+	"github.com/yassinebenaid/godump"
 )
 
 var (
@@ -17,9 +19,9 @@ var (
 	}
 )
 
-func newDev(cCtx *cli.Context) (*hd52_3d.Dev, error) {
-	serialPort := serialPortFlag.Get(cCtx)
-	modbusUnitId := modbusUnitIdFlag.Get(cCtx)
+func newDev(ctx context.Context, cmd *cli.Command) (*hd52_3d.Dev, error) {
+	serialPort := cmd.String(serialPortFlag.Name)
+	modbusUnitId := cmd.Uint(modbusUnitIdFlag.Name)
 
 	client, err := modbus.NewClient(&modbus.ClientConfiguration{
 		URL:      "rtu://" + serialPort,
@@ -45,8 +47,8 @@ func newDev(cCtx *cli.Context) (*hd52_3d.Dev, error) {
 	return dev, nil
 }
 
-func doRead(cCtx *cli.Context) error {
-	e, err := newDev(cCtx)
+func doRead(ctx context.Context, cmd *cli.Command) error {
+	e, err := newDev(ctx, cmd)
 	if err != nil {
 		return err
 	}
