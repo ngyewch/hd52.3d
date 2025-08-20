@@ -3,8 +3,9 @@ package hd52_3d
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/simonvetter/modbus"
 	"sync"
+
+	"github.com/simonvetter/modbus"
 )
 
 type Dev struct {
